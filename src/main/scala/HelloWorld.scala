@@ -4,6 +4,7 @@ import io.circe.Codec
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import io.circe.generic.semiauto._
 
+import scala.concurrent.duration.DurationInt
 import scala.scalajs.js
 
 case class Input(name: Option[String])
@@ -18,13 +19,16 @@ object Output {
 
 @JSExportTopLevel("HelloWorld")
 object HelloWorld {
-  def effectfulProgram(input: Input): IO[Output] =
-    IO.println("side-effecting")
-      .as(
-        Output(
-          s"Hello from effectful abstracted scala ${input.name.getOrElse("unknown name")}!"
+  def effectfulProgram(input: Input): IO[Output] = {
+    IO.println("ping") *>
+      IO.sleep(1.second) *>
+      IO.println("pong")
+        .as(
+          Output(
+            s"Hello from effectful abstracted scala ${input.name.getOrElse("unknown name")}!"
+          )
         )
-      )
+  }
 
   def pureProgram(input: Input): Output =
     Output(
